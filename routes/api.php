@@ -1,11 +1,15 @@
 <?php
 
 use App\Http\Controllers\API\authController;
+use App\Http\Controllers\ReferralsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// protected routes
+Route::group(['middleware' => ['auth:sanctum']], function(){
+    Route::post('/logout', [authController::class, 'logout']);
+    Route::get('/user', [authController::class, 'userProfile']);
+    Route::post('/admin/referrals', [ReferralsController::class, 'store']);
 });
 
 // public routes

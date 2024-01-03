@@ -16,7 +16,7 @@ class authController extends Controller
   //registering user
   public function register(Request $request)
   {
-    try{
+    try {
       $credentials = new User();
       $credentials->name = $request->name;
       $credentials->email = $request->email;
@@ -27,7 +27,7 @@ class authController extends Controller
       $response = $this->success_message([
         'token' => $token,
       ], 'Congrats you have created your account successfully', 200);
-    }catch(Exception $error){
+    } catch (Exception $error) {
       $response = [
         'status' => 500,
         'message' => $error->getMessage()
@@ -37,10 +37,11 @@ class authController extends Controller
   }
 
   // login user
-  public function login(Request $request){
+  public function login(Request $request)
+  {
     $user = User::where('email', $request->email)->first();
 
-    if($user && Hash::check($request->password, $user->password)){
+    if ($user && Hash::check($request->password, $user->password)) {
       $token = $user->createToken('Personal Access Token')->plainTextToken;
       $response = [
         'status' => 200,
@@ -48,12 +49,12 @@ class authController extends Controller
         'user' => $user,
         'message' => 'Successfully Login! Welcome Back'
       ];
-    } else if(!$user){
+    } else if (!$user) {
       $response = [
         'status' => 401,
         'message' => 'No account found with this email'
       ];
-    } else{
+    } else {
       $response = [
         'status' => 500,
         'message' => 'Wrong email or password! Please try again'
@@ -62,8 +63,31 @@ class authController extends Controller
     return response()->json($response);
   }
 
-  public function logout(Request $request){
+  // logout method
+  public function logout(Request $request)
+  {
     $request->user()->tokens()->delete();
     return response()->json(['message' => 'User logged out']);
+  }
+
+  // fetching user information functionality
+  public function userProfile(Request $request)
+  {
+    try {
+      $user = $request->user();
+
+      // attempting to retrieve token
+      $token = $request->bearerToken();
+
+      $response = [
+        'status' => 200,
+        'token' => $token,
+        'user' => $user,
+        'message' => 'message retrieved successfully',
+      ];
+    } catch (Exception $error) {
+      $response = ['status' => 500, 'message' => $error->getMessage()];
+    }
+    return response()->json($response);
   }
 }
