@@ -1,0 +1,17 @@
+users information
+
+1.  name: Admin
+    email: admin@admin.com
+    password: secret
+
+2.  name: Tutule
+    email: tutule@simkoko.com
+    password: tutule
+
+3.  name: Atufi
+    email: atufi@gege.com
+    password: atufi
+
+4.  name: Magoma
+    email: magoma@njechele.com
+    password:  njechele
