@@ -7,5 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class Referrals extends Model
 {
-    use HasFactory;
+  use HasFactory;
+
+  protected $fillable = [
+    'referred_user_id',
+    'referred_user_id',
+    'status',
+    'reward_type',
+    'reward_value',
+    'expiration_date',
+  ];
+
+  public function referrerUser(){
+    return $this->belongsTo(User::class, 'referrer_user_id');
+  }
+
+  public function referredUser(){
+    return $this->belongsTo(User::class, 'referred_user_id');
+  }
 }
