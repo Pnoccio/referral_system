@@ -10,6 +10,7 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     Route::post('/logout', [authController::class, 'logout']);
     Route::get('/user', [authController::class, 'userProfile']);
     Route::post('/admin/referrals', [ReferralsController::class, 'store']);
+    Route::get('/admin/referrals', [ReferralsController::class, 'index']);
 });
 
 // public routes
