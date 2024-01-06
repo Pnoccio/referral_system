@@ -15,3 +15,12 @@ users information
 4.  name: Magoma
     email: magoma@njechele.com
     password:  njechele
+
+
+Pending endpoint to implement
+1. POST /api/admin/referrals (Add a new referral) - due to the database issues
+
+2. PUT /api/admin/referrals/{id} (Update referral details - admin) - database issues
+
+3. POST /api/user/referrals/{id}/purchase (Simulate a referred user making a
+purchase) - database issues

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\Referrals;
 use App\Models\User;
 use Exception;
@@ -87,5 +88,74 @@ class ReferralsController extends Controller
     }
 
     return response()->json([$response]);
+  }
+
+  public function updateReferrals(Request $request, $id)
+  {
+    try {
+      // validate the request data
+      $validatedData = $request->validate([
+        'status' => 'required',
+        'reward_type' => 'required',
+        'reward_value' => 'required',
+        'expiration_date' => 'required|date',
+      ]);
+
+      //Find the referral by id
+      $referral = Referrals::findorFail($id);
+
+      //update referral details 
+      $referral->update($validatedData);
+
+      // return the json response
+      $response = [
+        'status' => 200,
+        'referral' => $referral,
+        'message' => 'Referral details updated successfully',
+      ];
+    } catch (Exception $error) {
+      // Handle any exceptions
+      $response = [
+        'status' => 500,
+        'message' => $error->getMessage(),
+      ];
+    }
+
+    return response()->json($response);
+  }
+
+  public function simulateUserPurchase(Request $request, $id)
+  {
+    try {
+      // getting the authenticated user
+      $user = $request->user();
+
+      // find the referral by id
+      $referral = Referrals::findOrFail($id);
+
+      // create a new order for the referred user
+      $order = Order::create([
+        "user_id" => $referral->referred_user_id,
+        
+      ]);
+
+      // updating the referral status to indicate a successful purchase
+      $referral->update(['status' => 'Completed']);
+
+      // return a JSON response with the simulated purchase details
+      $response = [
+        'status' => 200,
+        'order' => $order,
+        'message' => 'Simulated purchase successful'
+      ];
+    } catch (Exception $error) {
+      //Handle any occured exception
+      $response = [
+        'status' => 500,
+        'message' => $error->getMessage(),
+      ];
+    }
+
+    return response()->json($response);
   }
 }
