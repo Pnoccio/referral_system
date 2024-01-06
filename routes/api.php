@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\authController;
 use App\Http\Controllers\ReferralsController;
+use App\Models\Referrals;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -11,6 +12,7 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     Route::get('/user', [authController::class, 'userProfile']);
     Route::post('/admin/referrals', [ReferralsController::class, 'store']);
     Route::get('/admin/referrals', [ReferralsController::class, 'index']);
+    Route::get('/user/referrals', [ReferralsController::class, 'userReferrals']);
 });
 
 // public routes
