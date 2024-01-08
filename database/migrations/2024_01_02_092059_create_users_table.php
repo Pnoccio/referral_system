@@ -16,8 +16,10 @@ return new class extends Migration
       $table->string('name');
       $table->string('email')->unique();
       $table->string('password');
-      $table->foreignId('role_id')->references('id')->on('roles');
+      $table->unsignedBigInteger('role_id')->nullable();
       $table->timestamps();
+
+      $table->foreign('role_id')->references('id')->on('roles');
     });
   }
 

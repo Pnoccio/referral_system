@@ -10,7 +10,7 @@ class Referrals extends Model
   use HasFactory;
 
   protected $fillable = [
-    'referred_user_id',
+    'referrer_user_id',
     'referred_user_id',
     'status',
     'reward_type',

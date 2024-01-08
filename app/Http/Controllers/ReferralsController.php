@@ -7,6 +7,7 @@ use App\Models\Referrals;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class ReferralsController extends Controller
 {
@@ -25,13 +26,18 @@ class ReferralsController extends Controller
 
       // creating new referral 
       $referral = Referrals::create($validatedData);
-      $reponse = [
+      $response = [
         'status' => 201,
         'referral' => $referral,
         'message' => 'Referral created successfully',
       ];
-
-      $response = [];
+    } catch (ValidationException $e) {
+      // Handle validation errors
+      $response = [
+        'status' => 422,
+        'message' => $e->validator->errors()->first(),
+        'errors' => $e->validator->errors(),
+      ];
     } catch (Exception $error) {
       $response = [
         'status' => 500,
@@ -136,7 +142,7 @@ class ReferralsController extends Controller
       // create a new order for the referred user
       $order = Order::create([
         "user_id" => $referral->referred_user_id,
-        
+
       ]);
 
       // updating the referral status to indicate a successful purchase
