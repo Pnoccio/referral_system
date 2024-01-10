@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\authController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReferralsController;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     Route::put('/admin/referrals/{id}', [ReferralsController::class, 'updateReferrals']);
     Route::post('/admin/referrals/{id}/purchase', [ReferralsController::class, 'simulateUserPurchase']);
     Route::post('/admin/products', [ProductController::class, 'addProduct']);
+    Route::post('/user/orders/{id}/payment', [OrderController::class, 'OrderController@processOrderPayment']);
 });
 
 // public routes
