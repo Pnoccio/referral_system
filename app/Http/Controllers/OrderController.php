@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Order;
 use Exception;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
@@ -8,86 +9,86 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    public function processOrderPayment(Request $request, $id)
-    {
-        try {
-            // Validate the request data
-            $validatedData = $request->validate([
-              'user_id' => 'required|user,id',
-              'price' => 'required|numeric',
-              'payment_status' => 'required'
-            ]);
+  public function processOrderPayment(Request $request, $id)
+  {
+    try {
+      // Validate the request data
+      $validatedData = $request->validate([
+        'user_id' => 'required|user,id',
+        'price' => 'required|numeric',
+        'payment_status' => 'required'
+      ]);
 
-            // Find the order by id
-            $order = Order::findOrFail($id);
+      // Find the order by id
+      $order = Order::findOrFail($id);
 
-            // Check if the order has already been paid
-            if ($order->payment_status === 'completed') {
-                $response = [
-                    'status' => 400,
-                    'message' => 'Order has already been paid',
-                ];
-            } else {
-                // Ensure that the 'price' attribute exists in the order model
-                if (!$order->price) {
-                    $response = [
-                        'status' => 400,
-                        'message' => 'Invalid order: missing or invalid price',
-                    ];
-                } else {
-                    $provider = new PayPalClient();
-                    
-                    // Set API credentials
-                    $provider->setApiCredentials(config('paypal.credentials'));
+      // Check if the order has already been paid
+      if ($order->payment_status === 'completed') {
+        $response = [
+          'status' => 400,
+          'message' => 'Order has already been paid',
+        ];
+      } else {
+        // Ensure that the 'price' attribute exists in the order model
+        if (!$order->price) {
+          $response = [
+            'status' => 400,
+            'message' => 'Invalid order: missing or invalid price',
+          ];
+        } else {
+          $provider = new PayPalClient();
 
-                    // Set currency
-                    $provider->setCurrency(config('paypal.currency'));
+          // Set API credentials
+          $provider->setApiCredentials(config('paypal.credentials'));
 
-                    // Get PayPal access token
-                    $paypalToken = $provider->getAccessToken();
+          // Set currency
+          $provider->setCurrency(config('paypal.currency'));
 
-                    // Create an order
-                    $response = $provider->createOrder([
-                        'intent' => 'CAPTURE',
-                        'purchase_units' => [
-                            [
-                                'amount' => [
-                                    'currency_code' => config('paypal.currency'),
-                                    'value' => $order->price,
-                                ],
-                            ],
-                        ],
-                    ], $paypalToken); 
+          // Get PayPal access token
+          $paypalToken = $provider->getAccessToken();
 
-                    // Check if the request was successful
-                    if ($response['paypal_link']) {
-                        return redirect($response['paypal_link']);
-                    } else {
-                        // Handling error
-                        $response = [
-                            'status' => 500,
-                            'message' => 'Error initiating PayPal payment',
-                        ];
-                    }
+          // Create an order
+          $response = $provider->createOrder([
+            'intent' => 'CAPTURE',
+            'purchase_units' => [
+              [
+                'amount' => [
+                  'currency_code' => config('paypal.currency'),
+                  'value' => $order->price,
+                ],
+              ],
+            ],
+          ], $paypalToken);
 
-                    // Update the order's payment status after successful payment
-                    $order->update(['payment_status' => 'completed']);
-
-                    $response = [
-                        'status' => 200,
-                        'order' => $order,
-                        'message' => 'Order payment processed successfully',
-                    ];
-                }
-            }
-        } catch (Exception $error) {
-            // Handling any exception
+          // Check if the request was successful
+          if ($response['paypal_link']) {
+            return redirect($response['paypal_link']);
+          } else {
+            // Handling error
             $response = [
-                'status' => 500,
-                'message' => $error->getMessage(),
+              'status' => 500,
+              'message' => 'Error initiating PayPal payment',
             ];
-        }
+          }
 
-        return response()->json($response);
+          // Update the order's payment status after successful payment
+          $order->update(['payment_status' => 'completed']);
+
+          $response = [
+            'status' => 200,
+            'order' => $order,
+            'message' => 'Order payment processed successfully',
+          ];
+        }
+      }
+    } catch (Exception $error) {
+      // Handling any exception
+      $response = [
+        'status' => 500,
+        'message' => $error->getMessage(),
+      ];
     }
+
+    return response()->json($response);
+  }
 }
