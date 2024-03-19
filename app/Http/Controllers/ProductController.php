@@ -24,7 +24,7 @@ class ProductController extends Controller
       $response = [
         'status' => 201,
         'product' => $product,
-        'message' => 'Product has added'
+        'message' => 'Product has added',
       ];
     }catch(Exception $error){
       // handle exception
